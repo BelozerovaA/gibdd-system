@@ -10,9 +10,6 @@ export default function Map() {
   const zoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
   const zoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
   const resetZoom = () => setZoom(1);
-
-  // Если автомобиль только что зафиксирован, показываем карту с камерой № N
-  // выделенной красным (public/cam_N.png), иначе общую карту.
   const mapSrc = highlight ? `/cam_${highlight.camera}.png` : ALL_MAP;
 
   return (
@@ -59,7 +56,6 @@ export default function Map() {
         </div>
       )}
 
-      {/* Карта с зумом */}
       <div className="bg-white rounded-xl shadow-md overflow-auto" style={{ height: '700px' }}>
         <div
           className="transition-transform duration-300 origin-top-left"
@@ -71,7 +67,6 @@ export default function Map() {
           <img
             src={mapSrc}
             alt={highlight ? `Карта, камера №${highlight.camera}` : 'Карта камер'}
-            // если нужной картинки нет, показываем общую карту
             onError={(e) => {
               if (!e.currentTarget.src.endsWith(ALL_MAP)) e.currentTarget.src = ALL_MAP;
             }}
