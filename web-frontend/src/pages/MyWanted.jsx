@@ -151,7 +151,6 @@ export default function MyWanted() {
         </table>
       </div>
 
-      {/* Шаг 1: выбор ГРЗ */}
       {addStep === 1 && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
@@ -178,7 +177,6 @@ export default function MyWanted() {
         </div>
       )}
 
-      {/* Шаг 2: выбор причины розыска */}
       {addStep === 2 && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
@@ -210,7 +208,6 @@ export default function MyWanted() {
         </div>
       )}
 
-      {/* Подтверждение удаления */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center">
