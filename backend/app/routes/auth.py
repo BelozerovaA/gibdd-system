@@ -11,7 +11,6 @@ router = APIRouter()
 
 @router.post("/login", response_model=TokenResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
-    """Вход сотрудника по логину и паролю, в ответ выдаётся JWT-токен."""
     user = db.query(Employee).filter(
         Employee.login == request.login,
         Employee.is_active == True  # noqa: E712
