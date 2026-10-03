@@ -16,13 +16,12 @@ HISTORY_LIMIT = 200
 
 
 def in_period(alert_date: str, period: Optional[str], now: datetime) -> bool:
-    """Попадает ли дата оповещения («дд.мм.гггг») в выбранный период.
 
     Даты в БД хранятся строками, поэтому сравнивать их как строки нельзя
     («05.09.2026» > «03.10.2026»). Переводим в настоящие даты.
     """
     if period not in ("today", "week", "month"):
-        return True  # период не задан или неизвестен: фильтр не применяется
+        return True  
 
     try:
         alert_day = datetime.strptime(alert_date, DATE_FORMAT).date()
@@ -40,7 +39,6 @@ def in_period(alert_date: str, period: Optional[str], now: datetime) -> bool:
 
 
 def _get_own_alert(db: Session, alert_id: int, user: Employee) -> Alert:
-    """Оповещение можно менять только тому сотруднику, которому оно адресовано."""
     alert = db.query(Alert).filter(
         Alert.id == alert_id,
         Alert.employee_id == user.id
