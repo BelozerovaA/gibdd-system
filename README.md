@@ -61,8 +61,8 @@ sequenceDiagram
 
 ## Технологии
 
-- **Backend:** Python, FastAPI, SQLAlchemy, MySQL, JWT (python-jose), WebSocket
-- **Frontend:** React 18, Redux Toolkit, React Router, Tailwind CSS, Axios, React-Toastify
+- **Backend:** Python, FastAPI, SQLAlchemy, MySQL, WebSocket
+- **Frontend:** React 18, React Router, Tailwind CSS, Axios, React-Toastify
 
 ## Структура
 
