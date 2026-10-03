@@ -4,7 +4,6 @@ from fastapi import WebSocket
 
 
 class ConnectionManager:
-    """Хранит по одному активному WebSocket-соединению на сотрудника."""
 
     def __init__(self):
         self.active_connections: Dict[int, WebSocket] = {}
@@ -14,12 +13,6 @@ class ConnectionManager:
         self.active_connections[user_id] = websocket
 
     def disconnect(self, user_id: int, websocket: WebSocket = None):
-        """Удаляет соединение сотрудника.
-
-        Если передан websocket, удаляем только когда в словаре лежит именно он.
-        Иначе закрытие СТАРОГО соединения (например, при перезагрузке страницы)
-        вычёркивало бы уже установленное НОВОЕ, и оповещения переставали бы доходить.
-        """
         current = self.active_connections.get(user_id)
         if current is None:
             return
