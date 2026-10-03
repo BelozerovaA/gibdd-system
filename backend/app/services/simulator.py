@@ -7,19 +7,15 @@ from datetime import datetime
 from ..database import SessionLocal
 from ..models import WantedVehicle, Vehicle, Camera, Alert
 
-# Как часто (в секундах) симулятор пытается "обнаружить" автомобиль.
-# Для демонстрации можно уменьшить через DETECTION_INTERVAL_SECONDS в backend/.env
 DETECTION_INTERVAL_SECONDS = int(os.getenv("DETECTION_INTERVAL_SECONDS", "60"))
 
 
 def _camera_number(cam) -> int:
-    """Номер камеры на карте: «CAM-08» -> 8 (по нему выбирается картинка cam_8.png)."""
     digits = "".join(ch for ch in (cam.camera_id or "") if ch.isdigit())
     return int(digits) if digits else cam.id
 
 
 class TrafficSimulator:
-    """Симулятор фиксации разыскиваемых автомобилей камерами."""
 
     def __init__(self, employee_id: int, interval: int = DETECTION_INTERVAL_SECONDS):
         self.employee_id = employee_id
@@ -27,7 +23,7 @@ class TrafficSimulator:
         self.running = False
         self.thread = None
         self.on_detected_callback = None
-        self.paused = False  # ставится в True, пока ждём реакции пользователя на предыдущее обнаружение
+        self.paused = False  
 
     def start(self, callback=None):
         if self.running:
@@ -134,7 +130,6 @@ class TrafficSimulator:
 
 
 class SimulatorManager:
-    """Держит по одному симулятору на каждого залогиненного сотрудника."""
 
     def __init__(self):
         self._simulators = {}
@@ -142,9 +137,6 @@ class SimulatorManager:
     def start(self, employee_id: int, callback):
         sim = self._simulators.get(employee_id)
         if sim and sim.is_running():
-            # Пользователь заново открыл приложение (например, обновил страницу):
-            # предыдущее окно оповещения потеряно, значит ждать реакции на него
-            # больше нельзя, иначе симулятор остался бы на паузе навсегда.
             sim.resume()
             return sim
         sim = TrafficSimulator(employee_id)
