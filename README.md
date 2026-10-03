@@ -92,11 +92,11 @@ CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 **2. Backend**
 ```bash
 cd backend
-cp .env.example .env          # впишите свой пароль к MySQL и SECRET_KEY
+cp .env.example .env          
 python -m venv venv
-venv\Scripts\activate         # Windows;  Linux/Mac: source venv/bin/activate
+venv\Scripts\activate         
 pip install -r requirements.txt
-python seed.py                # создаёт таблицы и тестовые данные
+python seed.py                
 uvicorn app.main:app --reload --port 8000
 ```
 Проверка: http://localhost:8000/ , документация API: http://localhost:8000/docs
