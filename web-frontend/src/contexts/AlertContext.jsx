@@ -19,7 +19,6 @@ export function AlertProvider({ children }) {
 
   const [detection, setDetection] = useState(null);
   const [askFound, setAskFound] = useState(null);
-  // Камера, на которой только что зафиксирован автомобиль: { camera, address, plate }
   const [highlight, setHighlight] = useState(null);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ export function AlertProvider({ children }) {
           navigate('/map');
         }
       } catch (e) {
-        // игнорируем не-JSON сообщения
       }
     };
 
