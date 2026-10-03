@@ -1,12 +1,3 @@
-"""
-Скрипт первоначального наполнения БД тестовыми данными.
-
-Запуск (из папки backend, с активным venv):
-    python seed.py
-
-Идемпотентен: если сотрудники уже есть в БД, повторный запуск ничего не делает
-(кроме недостающих камер/категорий — они дозаполняются).
-"""
 import random
 import sys
 import os
@@ -24,7 +15,6 @@ models.Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
-# --- Подразделение -----------------------------------------------------
 department = db.query(Department).first()
 if not department:
     department = Department(
@@ -37,12 +27,7 @@ if not department:
     db.add(department)
     db.commit()
     db.refresh(department)
-    print(f"✅ Подразделение создано: {department.name}")
-
-# --- Сотрудники ----------------------------------------------------------
-# ВНИМАНИЕ: пароли хранятся так же, как в исходном проекте — открытым текстом
-# (auth.verify_password просто сравнивает строки). Для учебного проекта это
-# приемлемо, но для боевого использования нужно захешировать пароли.
+    print(f" Подразделение создано: {department.name}")
 EMPLOYEES = [
     ("belozerov_rv", "Admin2024", "Белозеров Роман Валерьевич", "Администратор", "belozerov@gibdd-kirov.example"),
     ("ivanov_ai", "Ivanov2024", "Иванов Алексей Игоревич", "Инспектор ДПС", "ivanov@gibdd-kirov.example"),
@@ -70,10 +55,9 @@ for login, password, full_name, position, email in EMPLOYEES:
         db.add(emp)
         db.commit()
         db.refresh(emp)
-        print(f"✅ Сотрудник создан: {full_name} (логин: {login} / пароль: {password})")
+        print(f" Сотрудник создан: {full_name} (логин: {login} / пароль: {password})")
     employees_by_login[login] = emp
 
-# --- Категории нарушений ---------------------------------------------------
 VIOLATIONS = [
     ("12.6", "Угон", "Угон транспортного средства", 120000),
     ("12.8", "Спецмероприятие", 'Оперативный план "Перехват"', 4000),
@@ -86,7 +70,6 @@ for code, name, desc, fine in VIOLATIONS:
         db.add(ViolationCategory(code=code, name=name, description=desc, fine_amount=fine))
 db.commit()
 
-# --- Камеры (координаты приблизительно по г. Киров) ------------------------
 CAMERAS = [
     ("CAM-01", "ул. Дзержинского / ул. Луганская", 58.6142, 49.6350, "Стационарная", 60),
     ("CAM-02", "ул. Лепсе / Октябрьский пр-т", 58.5981, 49.6395, "Стационарная", 60),
@@ -111,9 +94,8 @@ for camera_id, address, lat, lon, cam_type, speed_limit in CAMERAS:
             camera_type=cam_type, speed_limit=speed_limit, is_active=True,
         ))
 db.commit()
-print(f"✅ Камеры: {db.query(Camera).count()} в базе")
+print(f" Камеры: {db.query(Camera).count()} в базе")
 
-# --- Автомобили -------------------------------------------------------------
 MODELS = ["Lada Vesta", "Lada Granta", "Hyundai Solaris", "Kia Rio", "Toyota Camry",
           "Volkswagen Polo", "Renault Logan", "Skoda Octavia", "Nissan Almera",
           "Chevrolet Niva", "Ford Focus", "Mazda 3"]
@@ -145,9 +127,8 @@ while len(existing_plates) < target_count and attempts < 500:
     db.add(v)
     vehicles_created.append(v)
 db.commit()
-print(f"✅ Автомобили: {db.query(Vehicle).count()} в базе")
+print(f" Автомобили: {db.query(Vehicle).count()} в базе")
 
-# --- Немного автомобилей сразу в розыске, распределённых по сотрудникам ----
 if db.query(WantedVehicle).count() == 0:
     all_vehicles = db.query(Vehicle).all()
     all_categories = db.query(ViolationCategory).all()
@@ -169,7 +150,7 @@ if db.query(WantedVehicle).count() == 0:
         )
         db.add(wv)
     db.commit()
-    print("✅ Создано 10 автомобилей в розыске, распределённых между сотрудниками")
+    print(" Создано 10 автомобилей в розыске, распределённых между сотрудниками")
 
 db.close()
 print("\nГотово. Логины для входа (пароль указан рядом):")
