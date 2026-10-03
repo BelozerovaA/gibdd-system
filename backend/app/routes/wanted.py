@@ -125,11 +125,6 @@ def take_wanted(
         current_user: Employee = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
-    """Передать розыск автомобиля текущему сотруднику.
-
-    Запись прежнего сотрудника закрывается (статус «Передан»), для текущего
-    создаётся новая. Так по одному автомобилю всегда одна активная запись.
-    """
     wanted = db.query(WantedVehicle).filter(
         WantedVehicle.id == wanted_id,
         WantedVehicle.is_active == True
