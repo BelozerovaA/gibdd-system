@@ -20,10 +20,7 @@ from .websocket.manager import manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Создаём таблицы, если их ещё нет (то же делает seed.py).
     models.Base.metadata.create_all(bind=engine)
-    # Симулятор камер работает в отдельном потоке и через этот loop
-    # отправляет оповещения в WebSocket.
     runtime.set_main_loop(asyncio.get_running_loop())
     yield
 
