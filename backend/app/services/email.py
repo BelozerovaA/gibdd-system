@@ -25,12 +25,11 @@ class EmailNotifier:
             self.smtp_port = 465
 
     def send_alert_async(self, recipient_email, plate, address, time_str, date_str):
-        """Отправка уведомления асинхронно"""
         if not self.sender_email or not self.sender_password:
-            print("⚠️ SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) — письмо не отправлено")
+            print(" SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) — письмо не отправлено")
             return
         if not recipient_email or "@" not in recipient_email:
-            print(f"⚠️ Ошибка: Некорректный адрес получателя '{recipient_email}'")
+            print(f" Ошибка: Некорректный адрес получателя '{recipient_email}'")
             return
 
         thread = Thread(
@@ -41,10 +40,9 @@ class EmailNotifier:
         thread.start()
 
     def _send_email(self, recipient_email, plate, address, time_str, date_str):
-        """Отправка email (выполняется в отдельном потоке)"""
         maps_link = f"https://www.google.com/maps/search/?api=1&query={address.replace(' ', '+')}"
 
-        subject = f"🚨 РОЗЫСК: Обнаружен автомобиль {plate}"
+        subject = f" РОЗЫСК: Обнаружен автомобиль {plate}"
 
         html_body = f"""
         <html>
@@ -97,7 +95,7 @@ class EmailNotifier:
             server.login(self.sender_email, self.sender_password)
             server.sendmail(self.sender_email, [recipient_email], msg.as_string())
             server.quit()
-            print(f"✅ Email отправлен на {recipient_email} для {plate}")
+            print(f" Email отправлен на {recipient_email} для {plate}")
 
         except Exception as e:
-            print(f"❌ Ошибка отправки email: {e}")
+            print(f" Ошибка отправки email: {e}")
