@@ -1,12 +1,3 @@
-"""Загрузка тестовых сотрудников для seed.py из JSON-файла.
-
-Логины и пароли не хранятся в коде: они лежат в файле, путь к которому задаётся
-переменной окружения SEED_USERS_FILE (по умолчанию backend/seed_users.json).
-Файл seed_users.json не попадает в git (см. .gitignore), в репозитории лежит только
-шаблон seed_users.example.json.
-
-Модуль не обращается к базе данных, поэтому его можно проверять отдельно (tests/).
-"""
 import json
 import os
 from typing import Dict, List, Optional
@@ -14,16 +5,12 @@ from typing import Dict, List, Optional
 DEFAULT_FILE = "seed_users.json"
 REQUIRED_FIELDS = ("login", "password", "full_name", "position", "email")
 
-
 class SeedConfigError(Exception):
-    """Файл с тестовыми сотрудниками отсутствует или заполнен неверно."""
-
 
 def resolve_path(base_dir: str, path: Optional[str] = None) -> str:
     """Путь к JSON: аргумент, затем SEED_USERS_FILE, затем seed_users.json рядом с seed.py."""
     chosen = path or os.getenv("SEED_USERS_FILE") or DEFAULT_FILE
     return chosen if os.path.isabs(chosen) else os.path.join(base_dir, chosen)
-
 
 def load_employees(base_dir: str, path: Optional[str] = None) -> List[Dict[str, str]]:
     full_path = resolve_path(base_dir, path)
