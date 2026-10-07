@@ -60,6 +60,10 @@ export function AlertProvider({ children }) {
     try {
       await api.put(`/alerts/${detection.alert_id}/reaction`, { reaction_status: 'Принято' });
     } catch (e) {
+      // окно остаётся открытым, чтобы можно было повторить: иначе оповещение
+      // осталось бы на сервере без реакции, хотя сотрудник считает его принятым
+      toast.error('Не удалось отправить подтверждение, попробуйте ещё раз');
+      return;
     }
     const payload = detection;
     setDetection(null);

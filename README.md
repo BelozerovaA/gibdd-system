@@ -119,29 +119,23 @@ sequenceDiagram
 | `alerts` | Оповещения: что, где и кому, реакция и результат |
 | `user_logs` | Журнал действий (создаётся, но в коде пока не используется) |
 
-## Быстрый запуск
+# 1. База (в MySQL): CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 
-Нужны Python **3.12**, Node.js 18+ и MySQL. Подробно по каждой части: [backend/README.md](backend/README.md) и [web-frontend/README.md](web-frontend/README.md).
-
-```powershell
-# 1. база:  CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
-
-# 2. back
+# 2. Backend
 cd backend
 py -3.12 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env                          
-copy seed_users.example.json seed_users.json    
+copy .env.example .env # впишите пароль MySQL и SECRET_KEY
+copy seed_users.example.json seed_users.json # тестовые сотрудники
 python seed.py
 python -m uvicorn app.main:app --reload --port 8000
 
-# 3. front
+# 3. Frontend (в другом окне)
 cd web-frontend
 copy .env.example .env
 npm install
 npm start
-```
 
 Сайт: http://localhost:3000, документация API: http://localhost:8000/docs.
 

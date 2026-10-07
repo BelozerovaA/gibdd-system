@@ -2,6 +2,9 @@
 .env
 !.env.example
 
+# Тестовые доступы для seed.py (шаблон seed_users.example.json остаётся в git)
+seed_users.json
+
 # Python
 __pycache__/
 *.pyc
