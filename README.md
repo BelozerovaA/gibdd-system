@@ -124,19 +124,19 @@ sequenceDiagram
 Нужны Python **3.12**, Node.js 18+ и MySQL. Подробно по каждой части: [backend/README.md](backend/README.md) и [web-frontend/README.md](web-frontend/README.md).
 
 ```powershell
-# 1. База (в MySQL):  CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
+# 1. база:  CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 
-# 2. Backend
+# 2. back
 cd backend
 py -3.12 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env                          # впишите пароль MySQL и SECRET_KEY
-copy seed_users.example.json seed_users.json    # тестовые сотрудники
+copy .env.example .env                          
+copy seed_users.example.json seed_users.json    
 python seed.py
 python -m uvicorn app.main:app --reload --port 8000
 
-# 3. Frontend (в другом окне)
+# 3. front
 cd web-frontend
 copy .env.example .env
 npm install
