@@ -18,19 +18,19 @@ Python 3.12, FastAPI, SQLAlchemy 2, PyMySQL, python-jose (JWT), WebSocket, pytho
 ```powershell
 cd backend
 
-# 1. База данных (в MySQL)
+# 1. БД
 #    CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 
-# 2. Окружение и зависимости
+# 2. окружение и зависимости
 py -3.12 -m venv venv
-venv\Scripts\activate                 # Linux/Mac: source venv/bin/activate
+venv\Scripts\activate                 
 pip install -r requirements.txt
 
 # 3. Настройки
-copy .env.example .env                # впишите пароль MySQL и SECRET_KEY
-copy seed_users.example.json seed_users.json   # тестовые сотрудники (логины и пароли)
+copy .env.example .env                
+copy seed_users.example.json seed_users.json   
 
-# 4. Тестовые данные и запуск
+# 4. тестовые данные и запуск
 python seed.py
 python -m uvicorn app.main:app --reload --port 8000
 ```
