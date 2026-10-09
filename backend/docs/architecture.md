@@ -77,7 +77,7 @@ backend/
 
 1. Поток симулятора находит разыскиваемый автомобиль, создаёт запись `alerts` и вызывает колбэк `_on_detected` (`routes/simulator.py`).
 2. Колбэк передаёт сообщение в event loop через `asyncio.run_coroutine_threadsafe(...)` (поэтому нужен `runtime.main_loop`).
-3. `ConnectionManager.send_personal_message` отправляет JSON на WebSocket этого сотрудника.
+3. `ConnectionManager.send_personal_message` отправляет JSON на WebSocket этого сотрудника и возвращает `True`, если сообщение ушло. Колбэк ждёт этот результат (до 5 секунд) и возвращает его симулятору, а тот записывает его в `alerts.notification_sent`.
 4. Параллельно, если у сотрудника есть почта и настроен SMTP, письмо уходит в отдельном потоке.
 
 Подробности алгоритма: [simulator.md](simulator.md). Формат сообщения: [api.md](api.md#websocket-оповещения-в-реальном-времени).

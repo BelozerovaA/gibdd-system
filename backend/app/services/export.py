@@ -1,7 +1,3 @@
-"""Выгрузка истории оповещений в файлы Word (.docx) и Excel (.xlsx).
-
-Таблицы без цветовой заливки: обычные границы, заголовок жирным шрифтом.
-"""
 from datetime import datetime
 from io import BytesIO
 from typing import Sequence
@@ -28,7 +24,6 @@ def period_label(period) -> str:
 
 
 def status_label(reaction_status, found_status) -> str:
-    """Тот же статус, что показывают веб-интерфейс и мобильное приложение."""
     if found_status == "Да":
         return "Найден"
     if reaction_status == "Принято":
@@ -60,7 +55,7 @@ def build_history_docx(alerts: Sequence, employee_name: str, period) -> bytes:
     doc.add_paragraph(f"Сформировано: {datetime.now().strftime('%d.%m.%Y %H:%M')}")
 
     table = doc.add_table(rows=1, cols=len(HEADERS))
-    table.style = "Table Grid"  # обычные границы, без заливки
+    table.style = "Table Grid"
 
     for cell, text in zip(table.rows[0].cells, HEADERS):
         cell.paragraphs[0].add_run(text).bold = True

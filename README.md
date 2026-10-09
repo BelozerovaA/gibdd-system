@@ -72,6 +72,7 @@ sequenceDiagram
 
 7. **Оповещения создаёт симулятор** только по автомобилям **вошедшего** сотрудника, которые в розыске и ещё не задержаны, и только с активных камер.
 8. **Одно оповещение за раз.** После оповещения симулятор ждёт ответа сотрудника и ничего не создаёт.
+   **Оповещение не теряется.** Если страница была закрыта, оно сохраняется с пометкой «не доставлено» и показывается на главной странице среди оповещений без реакции.
 9. **Оповещение видит только адресат.** Менять и смотреть чужие оповещения нельзя.
 10. **Реакция сотрудника.** Он принимает оповещение («Принято») или отклоняет («Отклонено»; это можно сделать на главной странице).
 11. **Результат розыска.** После «Принято» сотрудника спрашивают «Автомобиль задержан?».
@@ -116,18 +117,23 @@ sequenceDiagram
 | `violation_categories` | Справочник причин розыска |
 | `wanted_vehicles` | Записи розыска: автомобиль, владелец, причина, статус, где и когда замечен |
 | `cameras` | Камеры видеофиксации с координатами |
-| `alerts` | Оповещения: что, где и кому, реакция и результат |
+| `alerts` | Оповещения: что, где и кому, доставлено ли, реакция и результат |
 | `user_logs` | Журнал действий (создаётся, но в коде пока не используется) |
 
-# 1. База (в MySQL): CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
+## Быстрый запуск
+
+Нужны Python **3.12**, Node.js 18+ и MySQL. Подробно по каждой части: [backend/README.md](backend/README.md) и [web-frontend/README.md](web-frontend/README.md).
+
+```powershell
+# 1. База (в MySQL):  CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 
 # 2. Backend
 cd backend
 py -3.12 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env # впишите пароль MySQL и SECRET_KEY
-copy seed_users.example.json seed_users.json # тестовые сотрудники
+copy .env.example .env                          # впишите пароль MySQL и SECRET_KEY
+copy seed_users.example.json seed_users.json    # тестовые сотрудники
 python seed.py
 python -m uvicorn app.main:app --reload --port 8000
 
@@ -136,6 +142,7 @@ cd web-frontend
 copy .env.example .env
 npm install
 npm start
+```
 
 Сайт: http://localhost:3000, документация API: http://localhost:8000/docs.
 

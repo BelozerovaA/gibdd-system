@@ -1,7 +1,3 @@
-"""Выбор SMTP-сервера в EmailNotifier (без сети и без остальных модулей приложения).
-
-Запуск из папки backend:   python -m unittest discover -s tests -v
-"""
 import importlib.util
 import os
 import unittest

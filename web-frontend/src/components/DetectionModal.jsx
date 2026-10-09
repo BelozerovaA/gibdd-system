@@ -9,7 +9,7 @@ export default function DetectionModal() {
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-pulse-once">
           <div className="bg-danger text-white px-6 py-4">
-            <h2 className="text-lg font-bold"> ВНИМАНИЕ! Обнаружен автомобиль</h2>
+            <h2 className="text-lg font-bold">ВНИМАНИЕ! Обнаружен автомобиль</h2>
           </div>
           <div className="p-6 space-y-2">
             <p><span className="text-gray-500">Гос. номер:</span> <span className="font-bold text-xl">{detection.plate}</span></p>
