@@ -5,14 +5,12 @@ from typing import Dict, List, Optional
 DEFAULT_FILE = "seed_users.json"
 REQUIRED_FIELDS = ("login", "password", "full_name", "position", "email")
 
-
 class SeedConfigError(Exception):
     """Файл с тестовыми сотрудниками отсутствует или заполнен неверно."""
 
 def resolve_path(base_dir: str, path: Optional[str] = None) -> str:
     chosen = path or os.getenv("SEED_USERS_FILE") or DEFAULT_FILE
     return chosen if os.path.isabs(chosen) else os.path.join(base_dir, chosen)
-
 
 def load_employees(base_dir: str, path: Optional[str] = None) -> List[Dict[str, str]]:
     full_path = resolve_path(base_dir, path)

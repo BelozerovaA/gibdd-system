@@ -16,7 +16,7 @@ Node.js 18 или новее и запущенный backend.
 
 ```powershell
 cd web-frontend
-copy .env.example .env      # Linux/Mac: cp .env.example .env
+copy .env.example .env      
 npm install
 npm start
 ```

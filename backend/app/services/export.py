@@ -55,7 +55,11 @@ def build_history_docx(alerts: Sequence, employee_name: str, period) -> bytes:
     doc.add_paragraph(f"Сформировано: {datetime.now().strftime('%d.%m.%Y %H:%M')}")
 
     table = doc.add_table(rows=1, cols=len(HEADERS))
+<<<<<<< HEAD
     table.style = "Table Grid"
+=======
+    table.style = "Table Grid"  
+>>>>>>> cc988d8a95767965fb2bdaa7c8fe905d435e39b1
 
     for cell, text in zip(table.rows[0].cells, HEADERS):
         cell.paragraphs[0].add_run(text).bold = True
