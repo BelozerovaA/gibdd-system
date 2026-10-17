@@ -63,9 +63,6 @@ export default function Dashboard() {
     try {
       await api.put(`/alerts/${alertId}/reaction`, { reaction_status: status });
       toast.success('Статус обновлен');
-      // Сотрудник отреагировал на оповещение здесь, а не в окне поверх карты:
-      // снимаем паузу, чтобы симулятор продолжил искать машины.
-      api.post('/simulator/resume').catch(() => {});
       fetchPendingAlerts();
       fetchStats();
     } catch (error) {

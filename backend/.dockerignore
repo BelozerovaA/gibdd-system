@@ -1,0 +1,10 @@
+# Секреты и локальные файлы не попадают в образ
+.env
+seed_users.json
+venv/
+.venv/
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+docs/

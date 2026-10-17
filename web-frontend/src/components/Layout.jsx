@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store';
 import { AlertProvider } from '../contexts/AlertContext';
 import DetectionModal from './DetectionModal';
-import api from '../services/api';
 import {
   HomeIcon,
   MagnifyingGlassIcon,
@@ -21,7 +20,6 @@ export default function Layout() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    api.post('/simulator/stop').catch(() => {});
     dispatch(logout());
     navigate('/login');
   };

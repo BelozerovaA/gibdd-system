@@ -1,0 +1,139 @@
+{
+  "cameras": [
+    {
+      "code": "CAM-01",
+      "address": "ул. Дзержинского / ул. Луганская",
+      "latitude": 58.6142,
+      "longitude": 49.635,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-02",
+      "address": "ул. Лепсе / Октябрьский пр-т",
+      "latitude": 58.5981,
+      "longitude": 49.6395,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-03",
+      "address": "ул. Лепсе / ул. Сормовская",
+      "latitude": 58.594,
+      "longitude": 49.628,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-04",
+      "address": "ул. Московская / ул. Производственная",
+      "latitude": 58.5882,
+      "longitude": 49.652,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-05",
+      "address": "ул. Воровского / ул. Производственная",
+      "latitude": 58.586,
+      "longitude": 49.671,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-06",
+      "address": "ул. Воровского / пр-т Строителей",
+      "latitude": 58.5828,
+      "longitude": 49.6825,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-07",
+      "address": "ул. Щорса / ул. Производственная",
+      "latitude": 58.5895,
+      "longitude": 49.6602,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-08",
+      "address": "ул. Московская 106/1",
+      "latitude": 58.599,
+      "longitude": 49.6547,
+      "type": "Мобильная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-09",
+      "address": "ул. Воровского / ул. Ивана Попова",
+      "latitude": 58.5795,
+      "longitude": 49.691,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-10",
+      "address": "ул. Воровского / ул. Горького",
+      "latitude": 58.6033,
+      "longitude": 49.6673,
+      "type": "Стационарная",
+      "speed_limit": 40,
+      "active": true
+    },
+    {
+      "code": "CAM-11",
+      "address": "ул. Воровского / Октябрьский пр-т",
+      "latitude": 58.5975,
+      "longitude": 49.665,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-12",
+      "address": "ул. Московская / Октябрьский пр-т",
+      "latitude": 58.601,
+      "longitude": 49.6555,
+      "type": "Стационарная",
+      "speed_limit": 60,
+      "active": true
+    },
+    {
+      "code": "CAM-13",
+      "address": "ул. Преображенская / Октябрьский пр-т",
+      "latitude": 58.6035,
+      "longitude": 49.66,
+      "type": "Стационарная",
+      "speed_limit": 40,
+      "active": true
+    },
+    {
+      "code": "CAM-14",
+      "address": "ул. Воровского / ул. Владимирская",
+      "latitude": 58.6068,
+      "longitude": 49.6748,
+      "type": "Стационарная",
+      "speed_limit": 40,
+      "active": true
+    },
+    {
+      "code": "CAM-15",
+      "address": "ул. Воровского / ул. Ленина",
+      "latitude": 58.6088,
+      "longitude": 49.669,
+      "type": "Стационарная",
+      "speed_limit": 40,
+      "active": true
+    }
+  ]
+}

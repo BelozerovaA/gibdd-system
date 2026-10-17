@@ -35,7 +35,7 @@ flowchart TB
 | `config.js` | Адреса и настройки из `.env`: `API_URL`, `WS_URL`, `FOUND_PROMPT_DELAY_MS` |
 | `services/api.js` | Axios с адресом API, подстановкой токена и обработкой `401` |
 | `store/` | Redux: данные авторизации (`authSlice`) |
-| `contexts/AlertContext.jsx` | Запуск симулятора, WebSocket, оповещения, подсветка камеры на карте |
+| `contexts/AlertContext.jsx` | WebSocket, оповещения, подсветка камеры на карте |
 | `components/Layout.jsx` | Боковое меню, выход, обёртка `AlertProvider` |
 | `components/PrivateRoute.jsx` | Защита страниц: без токена перенаправляет на `/login` |
 | `components/DetectionModal.jsx` | Окна «Обнаружен автомобиль» и «Автомобиль задержан?» |
@@ -63,7 +63,7 @@ flowchart TB
 2. Токен и данные сохраняются в Redux и в `localStorage` (ключи `token`, `user`), поэтому после обновления страницы сотрудник остаётся в системе.
 3. Axios добавляет заголовок `Authorization: Bearer <токен>` ко всем запросам.
 4. Если сервер отвечает `401` (токен истёк), токен удаляется и пользователь перенаправляется на `/login`.
-5. «Выйти» останавливает симулятор (`POST /simulator/stop`), очищает токен и ведёт на `/login`.
+5. «Выйти» очищает токен и ведёт на `/login`.
 
 ## Состояние
 

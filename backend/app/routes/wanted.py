@@ -7,8 +7,10 @@ from ..database import get_db
 from ..models import WantedVehicle, Vehicle, Employee, ViolationCategory
 from ..schemas import WantedVehicleCreate, WantedVehicleResponse
 from ..auth import get_current_user
+from ..services.camera_client import watchlist_publisher
 
 router = APIRouter()
+
 
 @router.get("/my", response_model=List[WantedVehicleResponse])
 def get_my_wanted(
@@ -38,6 +40,7 @@ def get_my_wanted(
         ))
     return result
 
+
 @router.get("/all", response_model=List[WantedVehicleResponse])
 def get_all_wanted(
         current_user: Employee = Depends(get_current_user),
@@ -65,6 +68,7 @@ def get_all_wanted(
             found_status=wv.found_status or "Нет"
         ))
     return result
+
 
 @router.post("/add")
 def add_wanted(
@@ -112,8 +116,10 @@ def add_wanted(
     db.add(wanted)
     db.commit()
     db.refresh(wanted)
+    watchlist_publisher.kick()
 
     return {"message": f"Автомобиль {data.plate} добавлен в розыск", "id": wanted.id}
+
 
 @router.post("/take/{wanted_id}")
 def take_wanted(
@@ -121,6 +127,11 @@ def take_wanted(
         current_user: Employee = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
+    """Передать розыск автомобиля текущему сотруднику.
+
+    Запись прежнего сотрудника закрывается (статус «Передан»), для текущего
+    создаётся новая. Так по одному автомобилю всегда одна активная запись.
+    """
     wanted = db.query(WantedVehicle).filter(
         WantedVehicle.id == wanted_id,
         WantedVehicle.is_active == True
@@ -157,6 +168,7 @@ def take_wanted(
     db.add(new_wanted)
     db.commit()
     db.refresh(new_wanted)
+    watchlist_publisher.kick()
 
     vehicle = db.query(Vehicle).filter(Vehicle.id == wanted.vehicle_id).first()
 
@@ -188,6 +200,7 @@ def delete_wanted(
     wanted.is_active = False
     wanted.status = "Удален"
     db.commit()
+    watchlist_publisher.kick()
 
     return {"message": f"Автомобиль {plate} удален из розыска"}
 
@@ -200,6 +213,7 @@ def get_available_plates(db: Session = Depends(get_db)):
         )
     ).all()
     return [p[0] for p in plates]
+
 
 @router.get("/violation-categories")
 def get_violation_categories(db: Session = Depends(get_db)):

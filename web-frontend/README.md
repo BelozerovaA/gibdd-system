@@ -1,6 +1,6 @@
 # Web-frontend: интерфейс сотрудника ГИБДД
 
-Одностраничное веб-приложение на **React**. Через него сотрудник входит в систему, ведёт список розыска, получает оповещения о разыскиваемых автомобилях и смотрит историю. Работает с [backend](../backend/README.md) по REST и WebSocket.
+Одностраничное веб-приложение на **React**. Через него сотрудник входит в систему, ведёт список розыска, получает оповещения о разыскиваемых автомобилях и смотрит историю. Работает с [сервисом ГИБДД (backend)](../backend/README.md) по REST и WebSocket. О камерах сайт ничего не знает: оповещение для него это сообщение от сервиса ГИБДД.
 
 Описание проекта в целом, бизнес-правила и ER-диаграмма: [корневой README](../README.md).
 
@@ -10,13 +10,17 @@ React 18, React Router 6, Redux Toolkit (состояние авторизаци
 
 ## Требования
 
-Node.js 18 или новее и запущенный backend.
+Node.js 18 или новее и запущенный backend. Чтобы приходили оповещения, нужен ещё и [сервис камер](../camera-service/README.md); проще всего запустить всё в Docker.
 
-## Быстрый старт
+## Запуск в Docker
+
+Сайт запускается вместе со всей системой: `docker compose up --build` в корне репозитория ([docs/docker.md](../docs/docker.md)). Образ собирается по [`Dockerfile`](Dockerfile): сначала сборка React-приложения, затем раздача через nginx ([`nginx.conf`](nginx.conf)), который перенаправляет `/api` и `/ws` в backend. Сайт доступен на http://localhost:3000.
+
+## Быстрый старт без Docker
 
 ```powershell
 cd web-frontend
-copy .env.example .env      
+copy .env.example .env      # Linux/Mac: cp .env.example .env
 npm install
 npm start
 ```
@@ -29,11 +33,11 @@ npm start
 
 | Переменная | По умолчанию | Назначение |
 |---|---|---|
-| `REACT_APP_API_URL` | `http://localhost:8000/api` | Адрес API |
+| `REACT_APP_API_URL` | `http://localhost:8000/api` | Адрес API. В Docker равен `/api` (относительный: сайт и API на одном адресе) |
 | `REACT_APP_WS_URL` | выводится из `REACT_APP_API_URL` | Адрес WebSocket, если он отличается |
 | `REACT_APP_FOUND_PROMPT_DELAY_MS` | `60000` | Через сколько миллисекунд после «Принято» спрашивать «Автомобиль задержан?» |
 
-Для демонстрации удобно поставить `REACT_APP_FOUND_PROMPT_DELAY_MS=10000`. Переменные читаются при запуске `npm start`: после изменения `.env` перезапустите.
+Для демонстрации удобно поставить `REACT_APP_FOUND_PROMPT_DELAY_MS=10000` (в Docker это `FOUND_PROMPT_DELAY_MS` в корневом `.env`). Переменные читаются при запуске `npm start`: после изменения `.env` перезапустите.
 
 ## Страницы
 

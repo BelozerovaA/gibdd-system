@@ -1,9 +1,12 @@
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, Field
 from typing import Optional
+
 
 class LoginRequest(BaseModel):
     login: str
     password: str
+
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -12,6 +15,7 @@ class TokenResponse(BaseModel):
     full_name: str
     position: str
     email: Optional[str] = None
+
 
 class UserResponse(BaseModel):
     id: int
@@ -28,6 +32,7 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class VehicleCreate(BaseModel):
     plate: str
     model: Optional[str] = None
@@ -35,6 +40,7 @@ class VehicleCreate(BaseModel):
     vin: Optional[str] = None
     owner_name: Optional[str] = None
     category: Optional[str] = None
+
 
 class VehicleResponse(BaseModel):
     id: int
@@ -45,9 +51,11 @@ class VehicleResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class WantedVehicleCreate(BaseModel):
     plate: str
     reason: str
+
 
 class WantedVehicleResponse(BaseModel):
     id: int
@@ -62,6 +70,7 @@ class WantedVehicleResponse(BaseModel):
     reaction_status: Optional[str] = "Ожидает"
     found_status: Optional[str] = "Нет"
 
+
 class CameraResponse(BaseModel):
     id: int
     camera_id: str
@@ -75,6 +84,7 @@ class CameraResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class AlertResponse(BaseModel):
     id: int
     vehicle_plate: str
@@ -87,8 +97,18 @@ class AlertResponse(BaseModel):
     wanted_status: Optional[str] = "В розыске"
     is_viewed: bool
 
+
 class AlertReactionRequest(BaseModel):
     reaction_status: str
 
+
 class AlertFoundRequest(BaseModel):
     found_status: str
+
+
+class CameraEvent(BaseModel):
+    """Событие от сервиса камер: камера зафиксировала автомобиль с таким ГРЗ."""
+    event_id: str = Field(min_length=1, max_length=64)
+    plate: str = Field(min_length=1, max_length=20)
+    camera_code: str = Field(min_length=1, max_length=20)
+    detected_at: datetime

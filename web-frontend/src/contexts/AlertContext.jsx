@@ -24,8 +24,6 @@ export function AlertProvider({ children }) {
   useEffect(() => {
     if (!user?.id || !token) return;
 
-    api.post('/simulator/start').catch(() => {});
-
     const ws = new WebSocket(`${WS_URL}/${user.id}?token=${token}`);
     wsRef.current = ws;
 
@@ -83,10 +81,6 @@ export function AlertProvider({ children }) {
       toast.error('Не удалось обновить статус');
     }
     setAskFound(null);
-    try {
-      await api.post('/simulator/resume');
-    } catch (e) {
-    }
   }, [askFound]);
 
   const clearHighlight = useCallback(() => setHighlight(null), []);

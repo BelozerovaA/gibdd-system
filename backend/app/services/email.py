@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class EmailNotifier:
     def __init__(self):
         self.sender_email = os.getenv("SMTP_USER", "")
         self.sender_password = os.getenv("SMTP_PASSWORD", "")
 
+        # Сервер и порт можно задать явно (SMTP_SERVER и SMTP_PORT в .env).
+        # Порт 587 означает STARTTLS, любой другой: SSL-соединение (обычно 465).
         explicit_server = os.getenv("SMTP_SERVER", "").strip()
         explicit_port = os.getenv("SMTP_PORT", "").strip()
 
@@ -19,6 +22,7 @@ class EmailNotifier:
         if explicit_server and explicit_port.isdigit():
             self.smtp_server = explicit_server
             self.smtp_port = int(explicit_port)
+        # иначе выбираем по домену почты отправителя
         elif "gmail.com" in email_lower:
             self.smtp_server = "smtp.gmail.com"
             self.smtp_port = 587
@@ -30,11 +34,12 @@ class EmailNotifier:
             self.smtp_port = 465
 
     def send_alert_async(self, recipient_email, plate, address, time_str, date_str):
+        """Отправка уведомления асинхронно"""
         if not self.sender_email or not self.sender_password:
-            print("⚠ SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) - письмо не отправлено")
+            print("⚠️ SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) — письмо не отправлено")
             return
         if not recipient_email or "@" not in recipient_email:
-            print(f"⚠ Ошибка: Некорректный адрес получателя '{recipient_email}'")
+            print(f"⚠️ Ошибка: Некорректный адрес получателя '{recipient_email}'")
             return
 
         thread = Thread(
@@ -45,9 +50,10 @@ class EmailNotifier:
         thread.start()
 
     def _send_email(self, recipient_email, plate, address, time_str, date_str):
+        """Отправка email (выполняется в отдельном потоке)"""
         maps_link = f"https://www.google.com/maps/search/?api=1&query={address.replace(' ', '+')}"
 
-        subject = f" Розыск: Обнаружен автомобиль {plate}"
+        subject = f"🚨 РОЗЫСК: Обнаружен автомобиль {plate}"
 
         html_body = f"""
         <html>
@@ -67,7 +73,7 @@ class EmailNotifier:
                     <div style="text-align: center; margin: 30px 0 10px 0;">
                         <a href="{maps_link}" 
                            style="background-color: #1976d2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                            Показать на карте
+                           📍 ПОКАЗАТЬ НА КАРТЕ
                         </a>
                     </div>
                     <p style="margin-top: 25px; font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
@@ -84,7 +90,7 @@ class EmailNotifier:
         msg['From'] = f"ГИБДД КИРОВ <{self.sender_email}>"
         msg['To'] = recipient_email
 
-        plain_body = f"Внимание! Обнаружен ГРЗ: {plate}\nМесто: {address}\nВремя: {time_str}\nДата: {date_str}"
+        plain_body = f"ВНИМАНИЕ! Обнаружен ГРЗ: {plate}\nМесто: {address}\nВремя: {time_str}\nДата: {date_str}"
         msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
         msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
@@ -100,7 +106,7 @@ class EmailNotifier:
             server.login(self.sender_email, self.sender_password)
             server.sendmail(self.sender_email, [recipient_email], msg.as_string())
             server.quit()
-            print(f" Email отправлен на {recipient_email} для {plate}")
+            print(f"✅ Email отправлен на {recipient_email} для {plate}")
 
         except Exception as e:
-            print(f" Ошибка отправки email: {e}")
+            print(f"❌ Ошибка отправки email: {e}")

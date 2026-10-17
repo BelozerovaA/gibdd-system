@@ -14,11 +14,16 @@ cp .env.example .env        # Windows: copy .env.example .env
 | `SECRET_KEY` | да | запасное значение в коде, см. [security.md](security.md) | Ключ подписи JWT. Сгенерировать: `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `ALGORITHM` | нет | `HS256` | Алгоритм подписи JWT |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | нет | `30` | Срок жизни токена доступа |
-| `DETECTION_INTERVAL_SECONDS` | нет | `60` | Как часто симулятор «видит» автомобиль, см. [simulator.md](simulator.md) |
+| `SERVICE_TOKEN` | да | нет | Общий секрет с сервисом камер (заголовок `X-Service-Token`). Должен совпадать в обоих сервисах. Только латинские буквы и цифры. Без него события от камер не принимаются. Сгенерировать: `python -c "import secrets; print(secrets.token_hex(16))"` |
+| `CAMERA_SERVICE_URL` | нет | пусто | Адрес сервиса камер, например `http://localhost:9000`. Если не задан, список розыска камерам не отправляется |
+| `WATCHLIST_RESYNC_SECONDS` | нет | `30` | Как часто список розыска отправляется камерам повторно |
+| `ALERT_COOLDOWN_SECONDS` | нет | `120` | Пауза после оповещения, раньше которой по тому же розыску не создаётся новое. `0` отключает паузу |
+| `APP_TIMEZONE` | нет | `Europe/Moscow` | Часовой пояс, в котором хранятся дата и время оповещений |
 | `SMTP_USER` | нет | пусто | Почта-отправитель оповещений |
 | `SMTP_PASSWORD` | нет | пусто | Пароль приложения (для Gmail это не пароль от аккаунта) |
 | `SMTP_SERVER`, `SMTP_PORT` | нет | по домену `SMTP_USER` | Почтовый сервер и порт. Нужны для сервисов, кроме Gmail и Яндекс |
 | `SEED_USERS_FILE` | нет | `seed_users.json` | Путь к файлу с тестовыми сотрудниками для `seed.py` |
+| `RUN_SEED` | нет | `1` | Только в Docker: заполнять ли базу тестовыми данными при старте контейнера (`0` отключает) |
 
 Срок жизни токена для скачивания отчёта (2 минуты) задан в коде (`EXPORT_TOKEN_MINUTES` в `routes/alerts.py`).
 

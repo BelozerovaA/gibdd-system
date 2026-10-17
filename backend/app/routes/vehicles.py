@@ -7,6 +7,7 @@ from ..auth import get_current_user
 
 router = APIRouter()
 
+
 @router.get("/")
 def get_vehicles(
         current_user: Employee = Depends(get_current_user),
@@ -14,6 +15,7 @@ def get_vehicles(
 ):
     vehicles = db.query(Vehicle).all()
     return [{"plate": v.plate, "model": v.model} for v in vehicles]
+
 
 @router.post("/")
 def create_vehicle(

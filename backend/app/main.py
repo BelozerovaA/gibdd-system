@@ -1,27 +1,32 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 
-from . import models, runtime
+from . import models
 from .auth import ALGORITHM, SECRET_KEY
 from .database import engine
 from .routes import alerts as alerts_routes
+from .routes import camera_events as camera_events_routes
 from .routes import auth as auth_routes
 from .routes import cameras as cameras_routes
 from .routes import employees as employees_routes
-from .routes import simulator as simulator_routes
 from .routes import vehicles as vehicles_routes
 from .routes import wanted as wanted_routes
+from .services.camera_client import watchlist_publisher
 from .websocket.manager import manager
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Создаём таблицы, если их ещё нет (то же делает seed.py).
     models.Base.metadata.create_all(bind=engine)
-    runtime.set_main_loop(asyncio.get_running_loop())
+    # Сервису камер (отдельный сервис) отправляется список разыскиваемых ГРЗ.
+    watchlist_publisher.start_from_env()
     yield
+    watchlist_publisher.stop()
+
 
 app = FastAPI(title="GIBDD API", version="1.0.0", lifespan=lifespan)
 
@@ -39,17 +44,19 @@ app.include_router(vehicles_routes.router, prefix="/api/vehicles", tags=["vehicl
 app.include_router(wanted_routes.router, prefix="/api/wanted", tags=["wanted"])
 app.include_router(alerts_routes.router, prefix="/api/alerts", tags=["alerts"])
 app.include_router(cameras_routes.router, prefix="/api/cameras", tags=["cameras"])
-app.include_router(simulator_routes.router, prefix="/api/simulator", tags=["simulator"])
+app.include_router(camera_events_routes.router, prefix="/api", tags=["camera-events"])
+
 
 @app.get("/")
 def root():
     return {"message": "GIBDD API", "status": "running"}
 
+
 def _employee_id_from_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("scope") == "export":
-            return None
+            return None  # токен для скачивания отчёта не открывает WebSocket
         return payload.get("sub")
     except JWTError:
         return None

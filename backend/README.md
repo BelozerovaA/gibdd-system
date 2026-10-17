@@ -1,8 +1,8 @@
-# Backend: API системы розыска ГИБДД
+# Backend: сервис ГИБДД
 
-Серверная часть: REST API и WebSocket на **FastAPI**, данные в **MySQL**. Обслуживает веб-клиент ([`web-frontend`](../web-frontend/README.md)) и содержит симулятор камер, который создаёт оповещения о разыскиваемых автомобилях.
+Серверная часть: REST API и WebSocket на **FastAPI**, данные в **MySQL**. Обслуживает клиентов ([сайт](../web-frontend/README.md) и [мобильное приложение](../AvtoDozor/README.md)), хранит розыск, принимает события от [сервиса камер](../camera-service/README.md), создаёт оповещения и доставляет их сотрудникам.
 
-Описание проекта в целом, бизнес-правила и ER-диаграмма: [корневой README](../README.md).
+Камеры в backend не входят: это отдельный сервис, с которым backend общается по [протоколу](../camera-service/docs/protocol.md). Описание проекта в целом: [корневой README](../README.md), архитектура: [docs/architecture.md](../docs/architecture.md). ER-диаграмма: [docs/er-diagram.png](../docs/er-diagram.png).
 
 ## Технологии
 
@@ -13,31 +13,37 @@ Python 3.12, FastAPI, SQLAlchemy 2, PyMySQL, python-jose (JWT), WebSocket, pytho
 - **Python 3.12.** На более новых версиях (3.13, 3.14) установка зависимостей падает: для закреплённой в `requirements.txt` версии `pydantic-core` нет готовой сборки, и pip пытается собирать её из исходников через Rust.
 - MySQL 8 (или совместимый).
 
-## Быстрый старт
+В Docker ничего из этого ставить не нужно: [docs/docker.md](../docs/docker.md).
+
+## Запуск в Docker
+
+Backend запускается вместе со всей системой командой `docker compose up --build` из корня репозитория: [docs/docker.md](../docs/docker.md). Образ собирается по [`Dockerfile`](Dockerfile), а при старте скрипт [`docker-entrypoint.sh`](docker-entrypoint.sh) дожидается базы данных, заполняет её тестовыми данными и запускает сервер.
+
+## Быстрый старт без Docker
 
 ```powershell
 cd backend
 
-# 1. БД
+# 1. База данных (в MySQL)
 #    CREATE DATABASE gibdd_db CHARACTER SET utf8mb4;
 
-# 2. окружение и зависимости
+# 2. Окружение и зависимости
 py -3.12 -m venv venv
-venv\Scripts\activate                 
+venv\Scripts\activate                 # Linux/Mac: source venv/bin/activate
 pip install -r requirements.txt
 
 # 3. Настройки
-copy .env.example .env                
-copy seed_users.example.json seed_users.json   
+copy .env.example .env                # впишите пароль MySQL, SECRET_KEY и SERVICE_TOKEN
+copy seed_users.example.json seed_users.json   # тестовые сотрудники (логины и пароли)
 
-# 4. тестовые данные и запуск
+# 4. Тестовые данные и запуск
 python seed.py
-python -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Проверка: http://localhost:8000/ вернёт `{"message": "GIBDD API", "status": "running"}`. Интерактивная документация: http://localhost:8000/docs.
 
-Для запуска мобильного клиента на телефоне добавьте `--host 0.0.0.0` к команде `uvicorn`.
+`--host 0.0.0.0` нужен, чтобы к серверу мог подключиться телефон. Оповещений без сервиса камер не будет: запустите его ([инструкция](../camera-service/README.md#запуск)) с тем же `SERVICE_TOKEN` и укажите его адрес в `CAMERA_SERVICE_URL` (по умолчанию в `.env.example` это `http://localhost:9000`).
 
 ## Тестовые сотрудники
 
@@ -45,11 +51,12 @@ python -m uvicorn app.main:app --reload --port 8000
 
 ## Настройки (`.env`)
 
-Главные переменные: `DATABASE_URL`, `SECRET_KEY`, `DETECTION_INTERVAL_SECONDS`, `SEED_USERS_FILE`, `SMTP_USER`, `SMTP_PASSWORD`. Полная таблица: [docs/configuration.md](docs/configuration.md).
+Главные переменные: `DATABASE_URL`, `SECRET_KEY`, `SERVICE_TOKEN`, `CAMERA_SERVICE_URL`, `ALERT_COOLDOWN_SECONDS`, `SEED_USERS_FILE`, `SMTP_USER`, `SMTP_PASSWORD`. Полная таблица: [docs/configuration.md](docs/configuration.md).
 
 ## Структура
 
 ```
+Dockerfile, docker-entrypoint.sh   образ и запуск в контейнере
 seed.py                  тестовые данные
 seed_data.py             загрузка тестовых сотрудников из JSON
 seed_users.example.json  шаблон тестовых сотрудников
@@ -57,9 +64,10 @@ tests/                   автотесты
 app/
   main.py                запуск приложения, маршруты, WebSocket
   models.py, schemas.py  таблицы и форматы данных
-  auth.py                токены
+  auth.py                токены входа
+  service_auth.py        проверка токена сервиса камер
   routes/                HTTP-маршруты
-  services/              симулятор камер, письма, отчёты
+  services/              правила оповещений, события камер, связь с сервисом камер, письма, отчёты
   websocket/             соединения WebSocket
 docs/                    подробная документация
 ```
@@ -74,7 +82,7 @@ docs/                    подробная документация
 | Профиль | `GET /api/employees/me` |
 | Розыск | `GET /api/wanted/my`, `GET /api/wanted/all`, `POST /api/wanted/add`, `POST /api/wanted/take/{id}`, `DELETE /api/wanted/{plate}` |
 | Оповещения | `GET /api/alerts/history`, `PUT /api/alerts/{id}/reaction`, `PUT /api/alerts/{id}/found`, экспорт в Word и Excel |
-| Симулятор | `POST /api/simulator/start`, `/stop`, `/resume` |
+| События камер | `POST /api/camera-events` (вызывает сервис камер, нужен `X-Service-Token`) |
 | Реальное время | WebSocket `/ws/{employee_id}?token=...` |
 
 ## Тесты
@@ -83,7 +91,7 @@ docs/                    подробная документация
 python -m unittest discover -s tests -v
 ```
 
-Тесты не требуют базы данных и дополнительных библиотек. Они проверяют загрузку тестовых сотрудников из JSON (в том числе ошибки в файле и отсутствие паролей в `seed.py`), выбор почтового сервера и доставку оповещений между потоком симулятора и WebSocket.
+Тесты не требуют базы данных и дополнительных библиотек (65 тестов). Они проверяют правила оповещений (когда оповещение создаётся, а когда нет), отправку списка розыска камерам настоящим HTTP-сервером, менеджер WebSocket, загрузку тестовых сотрудников из JSON (в том числе ошибки в файле и отсутствие паролей в `seed.py`) и выбор почтового сервера.
 
 ## Документация
 
@@ -91,8 +99,8 @@ python -m unittest discover -s tests -v
 |---|---|
 | [docs/architecture.md](docs/architecture.md) | Устройство backend, слои, как оповещение доходит до клиента |
 | [docs/api.md](docs/api.md) | Все маршруты и WebSocket, с примерами |
+| [docs/camera-events.md](docs/camera-events.md) | События от сервиса камер: правила обработки, отправка списка розыска |
 | [docs/database.md](docs/database.md) | Таблицы, поля, связи, ER-диаграмма |
-| [docs/simulator.md](docs/simulator.md) | Как работает симулятор камер |
 | [docs/configuration.md](docs/configuration.md) | Переменные окружения, почта, тестовые данные |
 | [docs/security.md](docs/security.md) | Что сделано для безопасности и что нужно доработать |
 
