@@ -1,13 +1,3 @@
-"""HTTP-интерфейс сервиса камер (протокол v1).
-
-    GET  /health            состояние сервиса (без токена)
-    GET  /v1/cameras        список камер
-    GET  /v1/watchlist      текущий список разыскиваемых ГРЗ
-    PUT  /v1/watchlist      заменить список: {"plates": ["А123ВК43", ...]}  (шлёт сервис ГИБДД)
-    POST /v1/detections     ручная фиксация: {"plate": "А123ВК43", "camera_code": "CAM-08"}
-
-Все маршруты /v1/* требуют заголовок X-Service-Token. Ошибки возвращаются как {"detail": "..."}.
-"""
 import hmac
 import json
 import logging
@@ -29,7 +19,6 @@ MAX_PLATE_LENGTH = 20
 
 
 class CameraApp:
-    """Состояние сервиса, которое видят обработчики запросов."""
 
     def __init__(self, settings: Settings, cameras, watchlist: Watchlist, emitter: Emitter):
         self.settings = settings
@@ -50,7 +39,6 @@ def make_server(app: CameraApp, host: str, port: int) -> ThreadingHTTPServer:
     class Handler(BaseHTTPRequestHandler):
         server_version = "CameraService/1.0"
 
-        # --- вспомогательное -------------------------------------------------
         def _send(self, status: int, payload: Dict[str, Any]) -> None:
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
@@ -122,10 +110,9 @@ def make_server(app: CameraApp, host: str, port: int) -> ThreadingHTTPServer:
         def do_DELETE(self):
             self._dispatch("DELETE")
 
-        def log_message(self, fmt, *args):  # стандартный вывод в stderr заменяем журналом
+        def log_message(self, fmt, *args):  
             log.debug("%s - %s", self.address_string(), fmt % args)
 
-        # --- маршруты ----------------------------------------------------------
         def _health(self):
             return 200, {"status": "ok", "cameras": len(app.cameras), "watchlist": len(app.watchlist)}
 
