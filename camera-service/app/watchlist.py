@@ -1,10 +1,7 @@
-"""Список ГРЗ, которые камеры должны искать. Его присылает сервис ГИБДД."""
 from threading import Lock
 from typing import Iterable, List
 
-
 def normalize_plate(plate: str) -> str:
-    """ГРЗ без пробелов и в верхнем регистре."""
     return "".join(str(plate).split()).upper()
 
 
@@ -14,7 +11,6 @@ class Watchlist:
         self._lock = Lock()
 
     def replace(self, plates: Iterable[str]) -> int:
-        """Полностью заменяет список (протокол присылает снимок, а не изменения)."""
         cleaned = {normalize_plate(p) for p in plates}
         cleaned.discard("")
         with self._lock:
