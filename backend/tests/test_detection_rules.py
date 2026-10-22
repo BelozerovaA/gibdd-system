@@ -1,8 +1,3 @@
-"""Правила обработки события от сервиса камер (services/detection_rules.py).
-
-Запуск из папки backend:   python -m unittest discover -s tests -v
-Модуль правил не зависит от БД и FastAPI, поэтому тесты запускаются без них.
-"""
 import importlib.util
 import os
 import threading

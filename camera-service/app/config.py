@@ -1,12 +1,10 @@
-"""Настройки сервиса камер. Всё берётся из переменных окружения."""
 import os
 from dataclasses import dataclass
 from typing import Mapping, Optional
 
 
 class ConfigError(Exception):
-    """Переменная окружения задана неверно."""
-
+    """переменная окружения задана неверно."""
 
 @dataclass(frozen=True)
 class Settings:

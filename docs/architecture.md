@@ -96,3 +96,8 @@ flowchart LR
 | Как сервис ГИБДД обрабатывает события | [backend/docs/camera-events.md](../backend/docs/camera-events.md) |
 | Как запустить всё одной командой | [docker.md](docker.md) |
 | Устройство сервиса камер | [camera-service/docs/architecture.md](../camera-service/docs/architecture.md) |
+
+
+## Транспорт камер
+
+Обмен с сервисом камер — **WebSocket** (одно соединение на камеру). См. [camera-service/docs/protocol.md](../camera-service/docs/protocol.md).

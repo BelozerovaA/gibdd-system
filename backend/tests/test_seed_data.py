@@ -1,8 +1,3 @@
-"""Проверка загрузчика тестовых сотрудников (seed_data.py).
-
-Запуск из папки backend:   python -m unittest discover -s tests -v
-Тесты не требуют БД и сторонних библиотек.
-"""
 import json
 import os
 import sys

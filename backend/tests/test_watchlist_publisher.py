@@ -1,9 +1,3 @@
-"""Отправка списка разыскиваемых ГРЗ сервису камер (services/camera_client.py).
-
-Запускается настоящий HTTP-сервер в отдельном потоке и проверяется протокол:
-метод, адрес, заголовки и тело запроса. База данных не нужна: список ГРЗ подаётся
-в тесте напрямую.
-"""
 import importlib.util
 import json
 import os
@@ -22,7 +16,6 @@ spec.loader.exec_module(camera_client)
 
 
 class FakeCameraService:
-    """Притворяется сервисом камер: запоминает запросы и отвечает заданным кодом."""
 
     def __init__(self, status=200):
         self.requests = []

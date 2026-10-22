@@ -8,7 +8,6 @@ KEYS = ("SMTP_USER", "SMTP_PASSWORD", "SMTP_SERVER", "SMTP_PORT")
 
 
 def make_notifier(**env):
-    """Создаёт EmailNotifier с заданными переменными окружения."""
     saved = {k: os.environ.get(k) for k in KEYS}
     try:
         for k in KEYS:

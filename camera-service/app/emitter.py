@@ -1,9 +1,6 @@
-"""Имитация работы камер: время от времени «увидеть» автомобиль из списка розыска.
+"""Имитация работы камер: периодическая и ручная фиксация через WebSocket."""
+from __future__ import annotations
 
-Реальной системы распознавания номеров нет, поэтому событие создаётся случайным выбором:
-берётся случайный ГРЗ из списка, который прислал сервис ГИБДД, и случайная работающая камера.
-Для сервиса ГИБДД это неотличимо от настоящей фиксации: он видит только событие по протоколу.
-"""
 import logging
 import random
 import threading
@@ -12,8 +9,8 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from .cameras import Camera, find_camera
-from .gibdd_client import DeliveryError, GibddClient
 from .watchlist import Watchlist, normalize_plate
+from .ws_client import CameraHub, DeliveryError
 
 log = logging.getLogger("camera-service")
 
@@ -24,8 +21,8 @@ class UnknownCamera(Exception):
         self.code = code
 
 
-def build_event(plate: str, camera: Camera, now: Optional[datetime] = None) -> Dict[str, Any]:
-    moment = now or datetime.now(timezone.utc)
+def build_event(plate: str, camera: Camera) -> Dict[str, Any]:
+    moment = datetime.now(timezone.utc)
     return {
         "event_id": uuid.uuid4().hex,
         "plate": plate,
@@ -35,44 +32,34 @@ def build_event(plate: str, camera: Camera, now: Optional[datetime] = None) -> D
 
 
 class Emitter:
-    def __init__(
-        self,
-        cameras: List[Camera],
-        watchlist: Watchlist,
-        client: GibddClient,
-        interval: float,
-        rng: Optional[random.Random] = None,
-    ):
+    def __init__(self, cameras, watchlist, hub, interval, rng=None):
         self.cameras = cameras
         self.watchlist = watchlist
-        self.client = client
+        self.hub = hub
         self.interval = interval
         self.rng = rng or random.Random()
 
-    def tick(self) -> Optional[Dict[str, Any]]:
-        """Один шаг: выбрать автомобиль и камеру и отправить событие. None, если отправлять нечего."""
+    def tick(self):
         plates = self.watchlist.snapshot()
         active = [c for c in self.cameras if c.active]
         if not plates or not active:
             return None
-
         plate = self.rng.choice(plates)
         camera = self.rng.choice(active)
         event = build_event(plate, camera)
+        sock = self.hub.get(camera.code)
+        if sock is None:
+            log.warning("Нет WS-клиента для камеры %s", camera.code)
+            return None
         try:
-            result = self.client.send_detection(event)
+            result = sock.send_detection(event)
         except DeliveryError as error:
             log.warning("Событие %s (%s, %s) не доставлено: %s", event["event_id"], plate, camera.code, error)
             return None
         log.info("Зафиксирован %s на %s: ответ ГИБДД %s", plate, camera.code, result)
         return result
 
-    def detect(self, plate: str, camera_code: Optional[str] = None) -> Dict[str, Any]:
-        """Ручная фиксация (для демонстрации и проверки): отправить событие немедленно.
-
-        Выбрасывает UnknownCamera, если код камеры не найден, и DeliveryError, если сервис
-        ГИБДД недоступен или отклонил событие.
-        """
+    def detect(self, plate: str, camera_code: Optional[str] = None):
         if camera_code is None:
             active = [c for c in self.cameras if c.active]
             if not active:
@@ -83,14 +70,16 @@ class Emitter:
             if camera is None or not camera.active:
                 raise UnknownCamera(camera_code)
         event = build_event(normalize_plate(plate), camera)
-        result = self.client.send_detection(event)
+        sock = self.hub.get(camera.code)
+        if sock is None:
+            raise DeliveryError(f"нет WS-клиента для {camera.code}")
+        result = sock.send_detection(event)
         return {"event": event, "gibdd_response": result}
 
     def run(self, stop: threading.Event) -> None:
-        """Цикл работы: ждать interval секунд, сделать шаг, повторять до остановки."""
-        log.info("Камеры включены, интервал фиксации %s с", self.interval)
+        log.info("Камеры включены, интервал фиксации %s с (транспорт: WebSocket)", self.interval)
         while not stop.wait(self.interval):
             try:
                 self.tick()
-            except Exception:  # сбой одного шага не должен остановить камеры
+            except Exception:
                 log.exception("Ошибка при фиксации")

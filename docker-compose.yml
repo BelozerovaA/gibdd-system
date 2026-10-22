@@ -40,7 +40,6 @@ services:
       DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE:-gibdd_db}
       SECRET_KEY: ${SECRET_KEY:?Задайте SECRET_KEY в файле .env}
       SERVICE_TOKEN: ${SERVICE_TOKEN:?Задайте SERVICE_TOKEN в файле .env}
-      CAMERA_SERVICE_URL: http://camera-service:9000
       ALERT_COOLDOWN_SECONDS: ${ALERT_COOLDOWN_SECONDS:-120}
       APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Moscow}
       SMTP_USER: ${SMTP_USER:-}

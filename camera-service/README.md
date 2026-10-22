@@ -18,7 +18,7 @@
 
 **В Docker** вместе со всей системой: [docs/docker.md](../docs/docker.md).
 
-**Отдельно, без Docker** (нужен только Python 3.12, зависимостей нет; в Docker используется та же версия):
+**Отдельно, без Docker** (Python 3.12; нужен пакет `websocket-client`):
 
 ```powershell
 cd camera-service

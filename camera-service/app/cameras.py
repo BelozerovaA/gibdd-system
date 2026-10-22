@@ -1,4 +1,3 @@
-"""Список камер: где стоят и какие адреса контролируют."""
 import json
 from dataclasses import dataclass
 from typing import List, Optional
@@ -6,7 +5,7 @@ from typing import List, Optional
 
 @dataclass(frozen=True)
 class Camera:
-    code: str            # «CAM-08»; по этому коду сервис ГИБДД находит камеру у себя
+    code: str
     address: str
     latitude: float
     longitude: float

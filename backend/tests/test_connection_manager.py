@@ -1,7 +1,3 @@
-"""Менеджер WebSocket-соединений (app/websocket/manager.py).
-
-Если fastapi не установлен, подставляется заглушка: менеджеру нужен только класс WebSocket.
-"""
 import asyncio
 import importlib.util
 import os

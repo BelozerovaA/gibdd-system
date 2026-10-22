@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useAlerts } from '../contexts/AlertContext';
 import { toast } from 'react-toastify';
 import {
   ShieldCheckIcon,
@@ -18,12 +19,27 @@ export default function Dashboard() {
   const [pendingAlerts, setPendingAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { detection } = useAlerts();
+
+  // при новом detection по WebSocket — сразу обновить список на главной
+  useEffect(() => {
+    if (detection?.alert_id) {
+      fetchPendingAlerts();
+    }
+  }, [detection?.alert_id]);
 
   useEffect(() => {
     fetchData();
-    // Poll for new alerts every 30 seconds
-    const interval = setInterval(fetchPendingAlerts, 30000);
-    return () => clearInterval(interval);
+    // Частый опрос: активные оповещения появляются и без перезагрузки
+    const interval = setInterval(fetchPendingAlerts, 5000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') fetchPendingAlerts();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   const fetchData = async () => {
