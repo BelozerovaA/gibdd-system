@@ -1,5 +1,3 @@
-#!/bin/sh
-# Запуск сервиса ГИБДД в контейнере: дождаться базы, заполнить её (один раз), запустить сервер.
 set -e
 
 echo "Жду базу данных..."
@@ -15,7 +13,6 @@ until python -c "from app.database import engine; engine.connect().close()" 2>/d
 done
 echo "База данных доступна."
 
-# seed.py безопасно запускать повторно: существующие записи не дублируются.
 if [ "${RUN_SEED:-1}" = "1" ]; then
     python seed.py
 fi
