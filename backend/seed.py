@@ -1,23 +1,10 @@
-"""
-Скрипт первоначального наполнения БД тестовыми данными.
-
-Запуск (из папки backend, с активным venv):
-    python seed.py
-
-Тестовые сотрудники (логины и пароли) берутся из JSON-файла, а не из кода:
-    copy seed_users.example.json seed_users.json     (один раз, затем правьте по желанию)
-Путь можно изменить переменной SEED_USERS_FILE в .env.
-
-Идемпотентен: если сотрудники уже есть в БД, повторный запуск ничего не делает
-(кроме недостающих камер/категорий — они дозаполняются).
-"""
 import random
 import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.database import SessionLocal, engine  # noqa: E402  (заодно загружает .env)
+from app.database import SessionLocal, engine  
 from app import models
 from seed_data import SeedConfigError, load_employees, resolve_path
 from app.models import (
@@ -28,8 +15,6 @@ from app.models import (
 models.Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
-
-# --- Подразделение -----------------------------------------------------
 department = db.query(Department).first()
 if not department:
     department = Department(
@@ -42,13 +27,8 @@ if not department:
     db.add(department)
     db.commit()
     db.refresh(department)
-    print(f"✅ Подразделение создано: {department.name}")
+    print(f" Подразделение создано: {department.name}")
 
-# --- Сотрудники ----------------------------------------------------------
-# Логины и пароли читаются из JSON (seed_users.json), в коде их нет.
-# ВНИМАНИЕ: в БД пароли хранятся открытым текстом (auth.verify_password просто
-# сравнивает строки). Для учебного проекта это приемлемо, для боевого использования
-# нужно хеширование (например, bcrypt).
 SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 try:
     EMPLOYEES = load_employees(SEED_DIR)
@@ -78,10 +58,9 @@ for item in EMPLOYEES:
         db.add(emp)
         db.commit()
         db.refresh(emp)
-        print(f"✅ Сотрудник создан: {full_name} (логин: {login})")
+        print(f" Сотрудник создан: {full_name} (логин: {login})")
     employees_by_login[login] = emp
 
-# --- Категории нарушений ---------------------------------------------------
 VIOLATIONS = [
     ("12.6", "Угон", "Угон транспортного средства", 120000),
     ("12.8", "Спецмероприятие", 'Оперативный план "Перехват"', 4000),
@@ -94,7 +73,6 @@ for code, name, desc, fine in VIOLATIONS:
         db.add(ViolationCategory(code=code, name=name, description=desc, fine_amount=fine))
 db.commit()
 
-# --- Камеры (координаты приблизительно по г. Киров) ------------------------
 CAMERAS = [
     ("CAM-01", "ул. Дзержинского / ул. Луганская", 58.6142, 49.6350, "Стационарная", 60),
     ("CAM-02", "ул. Лепсе / Октябрьский пр-т", 58.5981, 49.6395, "Стационарная", 60),
@@ -119,9 +97,8 @@ for camera_id, address, lat, lon, cam_type, speed_limit in CAMERAS:
             camera_type=cam_type, speed_limit=speed_limit, is_active=True,
         ))
 db.commit()
-print(f"✅ Камеры: {db.query(Camera).count()} в базе")
+print(f" Камеры: {db.query(Camera).count()} в базе")
 
-# --- Автомобили -------------------------------------------------------------
 MODELS = ["Lada Vesta", "Lada Granta", "Hyundai Solaris", "Kia Rio", "Toyota Camry",
           "Volkswagen Polo", "Renault Logan", "Skoda Octavia", "Nissan Almera",
           "Chevrolet Niva", "Ford Focus", "Mazda 3"]
@@ -153,9 +130,8 @@ while len(existing_plates) < target_count and attempts < 500:
     db.add(v)
     vehicles_created.append(v)
 db.commit()
-print(f"✅ Автомобили: {db.query(Vehicle).count()} в базе")
+print(f" Автомобили: {db.query(Vehicle).count()} в базе")
 
-# --- Немного автомобилей сразу в розыске, распределённых по сотрудникам ----
 if db.query(WantedVehicle).count() == 0:
     all_vehicles = db.query(Vehicle).all()
     all_categories = db.query(ViolationCategory).all()
@@ -177,7 +153,7 @@ if db.query(WantedVehicle).count() == 0:
         )
         db.add(wv)
     db.commit()
-    print("✅ Создано 10 автомобилей в розыске, распределённых между сотрудниками")
+    print(" Создано 10 автомобилей в розыске, распределённых между сотрудниками")
 
 db.close()
 print("\nГотово. Логины для входа (пароли заданы в файле " + resolve_path(SEED_DIR) + "):")
