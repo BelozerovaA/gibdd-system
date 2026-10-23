@@ -1,4 +1,3 @@
-"""WebSocket-соединения камер: по одному на каждую камеру (camera_code)."""
 from __future__ import annotations
 
 import asyncio
@@ -8,7 +7,6 @@ from fastapi import WebSocket
 
 
 class CameraConnectionManager:
-    """Хранит активные WS-соединения камер: camera_code -> WebSocket."""
 
     def __init__(self) -> None:
         self._connections: Dict[str, WebSocket] = {}
