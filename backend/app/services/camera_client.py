@@ -1,4 +1,3 @@
-"""Рассылка списка разыскиваемых ГРЗ подключённым камерам по WebSocket."""
 from __future__ import annotations
 
 import asyncio
