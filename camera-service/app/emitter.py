@@ -1,4 +1,3 @@
-"""Имитация работы камер: периодическая и ручная фиксация через WebSocket."""
 from __future__ import annotations
 
 import logging

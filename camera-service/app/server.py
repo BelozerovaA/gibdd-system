@@ -1,15 +1,11 @@
-"""Локальный HTTP: health, камеры, ручная фиксация. Watchlist и detection — только WebSocket."""
 import hmac
 import json
 import logging
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Dict, Optional
 
-from .config import Settings
-from .emitter import Emitter, UnknownCamera
-from .watchlist import Watchlist
-from .ws_client import CameraHub, DeliveryError, DeliveryRejected
+from .emitter import UnknownCamera
+from .ws_client import DeliveryError, DeliveryRejected
 
 log = logging.getLogger("camera-service")
 MAX_BODY_BYTES = 64 * 1024

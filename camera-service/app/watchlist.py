@@ -1,7 +1,6 @@
 from threading import Lock
 from typing import Iterable, List
 
-
 def normalize_plate(plate: str) -> str:
     return "".join(str(plate).split()).upper()
 

@@ -8,16 +8,16 @@ class ConfigError(Exception):
 
 @dataclass(frozen=True)
 class Settings:
-    gibdd_url: str                 # адрес сервиса ГИБДД, куда отправляются события
-    service_token: str             # общий секрет двух сервисов
-    interval_seconds: float        # как часто камеры «видят» автомобиль из списка
+    gibdd_url: str                 
+    service_token: str             
+    interval_seconds: float        
     host: str
     port: int
     cameras_file: str
-    request_timeout: float         # таймаут одного запроса к сервису ГИБДД
-    delivery_attempts: int         # сколько раз пробовать отправить событие
-    retry_delay: float             # пауза между попытками (растёт с номером попытки)
-    manual_detections_enabled: bool  # разрешена ли ручная фиксация POST /v1/detections
+    request_timeout: float         
+    delivery_attempts: int         
+    retry_delay: float             
+    manual_detections_enabled: bool  
 
 
 def _number(env: Mapping[str, str], name: str, default: float, minimum: float, cast=float):
