@@ -1,20 +1,13 @@
-"""Обработка события от сервиса камер: поиск розыска, создание оповещения в БД.
-
-Правила (создавать ли оповещение) находятся в detection_rules.py, здесь только
-запросы к базе и сохранение результата.
-"""
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, Optional
-
 from ..database import SessionLocal
 from ..models import Alert, Camera, Vehicle, WantedVehicle
 from . import detection_rules as rules
 
 
 class UnknownCameraError(Exception):
-    """Камера с таким кодом не найдена в базе или отключена."""
 
     def __init__(self, camera_code: str):
         super().__init__(camera_code)
@@ -23,7 +16,7 @@ class UnknownCameraError(Exception):
 
 @dataclass
 class DetectionOutcome:
-    status: str  # "accepted": оповещение создано, "ignored": событие принято, оповещения нет
+    status: str  
     reason: Optional[str] = None
     alert_id: Optional[int] = None
     employee_id: Optional[int] = None
@@ -47,7 +40,6 @@ def process_camera_event(
     camera_code: str,
     detected_at: datetime,
 ) -> DetectionOutcome:
-    """Создаёт оповещение, если автомобиль в розыске и сотрудника пора оповестить."""
     if _deduplicator.contains(event_id):
         return DetectionOutcome("ignored", rules.IGNORE_DUPLICATE)
 
@@ -141,7 +133,6 @@ def process_camera_event(
 
 
 def mark_notification_sent(alert_id: int) -> None:
-    """Отмечает, что оповещение доставлено сотруднику по WebSocket."""
     with SessionLocal() as db:
         alert = db.get(Alert, alert_id)
         if alert is not None:
