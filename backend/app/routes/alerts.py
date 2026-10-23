@@ -19,13 +19,8 @@ HISTORY_LIMIT = 200
 
 
 def in_period(alert_date: str, period: Optional[str], now: datetime) -> bool:
-    """Попадает ли дата оповещения («дд.мм.гггг») в выбранный период.
-
-    Даты в БД хранятся строками, поэтому сравнивать их как строки нельзя
-    («05.09.2026» > «03.10.2026»). Переводим в настоящие даты.
-    """
     if period not in ("today", "week", "month"):
-        return True  # период не задан или неизвестен: фильтр не применяется
+        return True  
 
     try:
         alert_day = datetime.strptime(alert_date, DATE_FORMAT).date()
@@ -37,13 +32,11 @@ def in_period(alert_date: str, period: Optional[str], now: datetime) -> bool:
         start = today
     elif period == "week":
         start = today - timedelta(days=7)
-    else:  # month
+    else:  
         start = today - timedelta(days=30)
     return alert_day >= start
 
-
 def _get_own_alert(db: Session, alert_id: int, user: Employee) -> Alert:
-    """Оповещение можно менять только тому сотруднику, которому оно адресовано."""
     alert = db.query(Alert).filter(
         Alert.id == alert_id,
         Alert.employee_id == user.id
@@ -52,9 +45,7 @@ def _get_own_alert(db: Session, alert_id: int, user: Employee) -> Alert:
         raise HTTPException(status_code=404, detail="Оповещение не найдено")
     return alert
 
-
 def _alerts_for_period(db: Session, user: Employee, period: Optional[str]) -> List[Alert]:
-    """Оповещения сотрудника за период, от новых к старым (не больше HISTORY_LIMIT)."""
     alerts = db.query(Alert).filter(
         Alert.employee_id == user.id
     ).order_by(Alert.id.desc()).all()
@@ -132,7 +123,6 @@ def update_alert_found(
             wanted.reaction_status = "Ожидает"
 
     db.commit()
-    # «Найден» убирает автомобиль из розыска: камерам нужен обновлённый список
     watchlist_publisher.kick()
     return {"message": "Статус найден обновлен"}
 
@@ -162,21 +152,13 @@ def get_pending_alerts(
 
 EXPORT_TOKEN_MINUTES = 2
 
-
 @router.post("/export-token")
 def create_export_token(current_user: Employee = Depends(get_current_user)):
-    """Короткоживущий токен для скачивания отчёта.
-
-    Мобильное приложение открывает ссылку на скачивание в браузере телефона,
-    а браузер не умеет передавать заголовок Authorization. Поэтому вместо основного
-    токена в ссылку кладётся одноразового назначения токен на 2 минуты.
-    """
     token = create_access_token(
         {"sub": str(current_user.id), "scope": "export"},
         expires_delta=timedelta(minutes=EXPORT_TOKEN_MINUTES),
     )
     return {"token": token, "expires_in": EXPORT_TOKEN_MINUTES * 60}
-
 
 @router.get("/export")
 def export_history(
@@ -185,7 +167,6 @@ def export_history(
         token: str = Query(...),
         db: Session = Depends(get_db)
 ):
-    """Скачивание истории оповещений в Word или Excel (токен берётся из /export-token)."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
