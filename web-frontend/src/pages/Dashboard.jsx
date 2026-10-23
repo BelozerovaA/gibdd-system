@@ -21,7 +21,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { detection } = useAlerts();
 
-  // при новом detection по WebSocket — сразу обновить список на главной
   useEffect(() => {
     if (detection?.alert_id) {
       fetchPendingAlerts();
@@ -30,7 +29,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-    // Частый опрос: активные оповещения появляются и без перезагрузки
     const interval = setInterval(fetchPendingAlerts, 5000);
     const onVisible = () => {
       if (document.visibilityState === 'visible') fetchPendingAlerts();
