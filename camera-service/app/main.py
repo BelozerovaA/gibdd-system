@@ -1,4 +1,3 @@
-"""Точка входа: WebSocket к сервису ГИБДД (по соединению на камеру)."""
 from __future__ import annotations
 
 import logging
