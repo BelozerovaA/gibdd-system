@@ -1,6 +1,5 @@
-# Единые переводы строк в репозитории (на Windows git сам подставит CRLF в рабочей копии)
 * text=auto
-# Скрипты для Linux-контейнеров всегда с LF, иначе контейнер не запустится
+
 *.sh text eol=lf
 Dockerfile text eol=lf
 nginx.conf text eol=lf
