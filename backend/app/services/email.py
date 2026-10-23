@@ -12,17 +12,12 @@ class EmailNotifier:
     def __init__(self):
         self.sender_email = os.getenv("SMTP_USER", "")
         self.sender_password = os.getenv("SMTP_PASSWORD", "")
-
-        # Сервер и порт можно задать явно (SMTP_SERVER и SMTP_PORT в .env).
-        # Порт 587 означает STARTTLS, любой другой: SSL-соединение (обычно 465).
         explicit_server = os.getenv("SMTP_SERVER", "").strip()
         explicit_port = os.getenv("SMTP_PORT", "").strip()
-
         email_lower = self.sender_email.lower()
         if explicit_server and explicit_port.isdigit():
             self.smtp_server = explicit_server
             self.smtp_port = int(explicit_port)
-        # иначе выбираем по домену почты отправителя
         elif "gmail.com" in email_lower:
             self.smtp_server = "smtp.gmail.com"
             self.smtp_port = 587
@@ -34,12 +29,11 @@ class EmailNotifier:
             self.smtp_port = 465
 
     def send_alert_async(self, recipient_email, plate, address, time_str, date_str):
-        """Отправка уведомления асинхронно"""
         if not self.sender_email or not self.sender_password:
-            print("⚠️ SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) — письмо не отправлено")
+            print(" SMTP не настроен (SMTP_USER/SMTP_PASSWORD пустые) — письмо не отправлено")
             return
         if not recipient_email or "@" not in recipient_email:
-            print(f"⚠️ Ошибка: Некорректный адрес получателя '{recipient_email}'")
+            print(f" Ошибка: Некорректный адрес получателя '{recipient_email}'")
             return
 
         thread = Thread(
@@ -50,7 +44,6 @@ class EmailNotifier:
         thread.start()
 
     def _send_email(self, recipient_email, plate, address, time_str, date_str):
-        """Отправка email (выполняется в отдельном потоке)"""
         maps_link = f"https://www.google.com/maps/search/?api=1&query={address.replace(' ', '+')}"
 
         subject = f"🚨 РОЗЫСК: Обнаружен автомобиль {plate}"
