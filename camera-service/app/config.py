@@ -4,7 +4,6 @@ from typing import Mapping, Optional
 
 
 class ConfigError(Exception):
-    """переменная окружения задана неверно."""
 
 @dataclass(frozen=True)
 class Settings:
