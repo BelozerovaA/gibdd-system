@@ -1,4 +1,3 @@
-"""WebSocket-клиенты камер: по одному постоянному соединению на каждую камеру."""
 from __future__ import annotations
 
 import json
@@ -13,7 +12,7 @@ log = logging.getLogger("camera-service")
 
 try:
     import websocket
-except ImportError:  # pragma: no cover
+except ImportError:  
     websocket = None
 
 
