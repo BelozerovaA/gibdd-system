@@ -18,15 +18,7 @@ email_notifier = EmailNotifier()
 
 @router.post("/camera-events", dependencies=[Depends(require_service_token)])
 async def receive_camera_event(event: CameraEvent):
-    """Принимает от сервиса камер событие «камера зафиксировала автомобиль».
-
-    Если автомобиль в розыске, создаёт оповещение, отправляет его сотруднику по WebSocket
-    и (при настроенной почте) письмом. Ответ всегда сообщает, что произошло:
-    {"status": "accepted", "alert_id": ..., "delivered": ...} или
-    {"status": "ignored", "reason": "not_wanted" | "pending_alert" | "cooldown" | "duplicate"}.
-    """
     try:
-        # работа с БД синхронная, поэтому выполняется в пуле потоков, а не в event loop
         outcome = await run_in_threadpool(
             process_camera_event,
             event.event_id,
